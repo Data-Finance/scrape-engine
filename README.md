@@ -55,8 +55,6 @@ Run a single test class or method:
 ./mvnw test -Dtest=ScrapeEngineApplicationTests#contextLoads
 ```
 
-The `@SpringBootTest` tests need `.env` and `certs/`.
-
 ### Users
 
 Add a user in MongoDB (`scrape-config` → `users`) with a BCrypt hash of their password:

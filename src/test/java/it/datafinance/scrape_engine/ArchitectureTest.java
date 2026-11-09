@@ -18,7 +18,7 @@ import com.tngtech.archunit.lang.ArchRule;
 class ArchitectureTest {
 
   @ArchTest
-  static final ArchRule domainIsPure =
+  static final ArchRule should_keepDomainFreeOfFrameworksAndAdapters =
       noClasses()
           .that()
           .resideInAPackage("..domain..")
@@ -29,7 +29,7 @@ class ArchitectureTest {
 
   // Application services may only use Spring's transaction annotations (@Transactional)
   @ArchTest
-  static final ArchRule applicationOnlyUsesSpringTransactions =
+  static final ArchRule should_allowOnlySpringTransactionsInApplication =
       noClasses()
           .that()
           .resideInAPackage("..application..")
@@ -41,7 +41,7 @@ class ArchitectureTest {
 
   // Driving (inbound) adapters must go through use cases, never straight to driven ports
   @ArchTest
-  static final ArchRule inboundAdaptersDoNotUseOutboundPorts =
+  static final ArchRule should_notLetInboundAdaptersUseOutboundPorts =
       noClasses()
           .that()
           .resideInAPackage("..adapter.in..")
@@ -52,7 +52,7 @@ class ArchitectureTest {
 
   // Adapters talk to the application only through ports, not to service implementations
   @ArchTest
-  static final ArchRule adaptersDoNotUseApplicationServices =
+  static final ArchRule should_notLetAdaptersUseApplicationServices =
       noClasses()
           .that()
           .resideInAPackage("..adapter..")
@@ -62,7 +62,7 @@ class ArchitectureTest {
           .allowEmptyShould(true);
 
   @ArchTest
-  static final ArchRule layers =
+  static final ArchRule should_respectOnionLayers =
       onionArchitecture()
           .domainModels("..domain.model..")
           .domainServices("..domain.service..")

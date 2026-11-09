@@ -1,86 +1,48 @@
 package it.datafinance.scrape_engine.adapter.in.web.auth;
 
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.jayway.jsonpath.JsonPath;
-import it.datafinance.scrape_engine.application.port.out.UserAccountRepository;
-import it.datafinance.scrape_engine.domain.model.Role;
-import it.datafinance.scrape_engine.domain.model.UserAccount;
-import java.util.Optional;
-import java.util.Set;
+import it.datafinance.scrape_engine.adapter.in.web.auth.dto.LoginRequestDto;
+import it.datafinance.scrape_engine.adapter.in.web.auth.dto.TokenResponseDto;
+import it.datafinance.scrape_engine.application.exception.InvalidCredentialsException;
+import it.datafinance.scrape_engine.application.port.in.LoginUseCase;
+import it.datafinance.scrape_engine.domain.model.AuthToken;
+import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@ExtendWith(MockitoExtension.class)
 class AuthControllerTest {
 
-  @Autowired MockMvc mvc;
-  @Autowired PasswordEncoder passwordEncoder;
-  @MockitoBean UserAccountRepository users;
+  @Mock private LoginUseCase loginUseCase;
+
+  private AuthController controller;
 
   @BeforeEach
-  void seedUser() {
-    given(users.findByUsername(anyString())).willReturn(Optional.empty());
-    given(users.findByUsername("alice"))
-        .willReturn(
-            Optional.of(
-                new UserAccount(
-                    "1", "alice", passwordEncoder.encode("secret"), Set.of(Role.USER))));
+  void setUp() {
+    controller = new AuthController(loginUseCase);
   }
 
   @Test
-  void validCredentialsReturnUsableToken() throws Exception {
-    String body =
-        mvc.perform(
-                post("/auth/token")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content("{\"username\":\"alice\",\"password\":\"secret\"}"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.token").isNotEmpty())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-    String token = JsonPath.read(body, "$.token");
+  void should_returnTokenValue_when_loginSucceeds() {
+    given(loginUseCase.login("alice", "secret")).willReturn(new AuthToken("jwt", Instant.EPOCH));
 
-    mvc.perform(get("/api/secure/hello").header("Authorization", "Bearer " + token))
-        .andExpect(status().isOk())
-        .andExpect(content().string("Hello, alice"));
+    TokenResponseDto response = controller.token(new LoginRequestDto("alice", "secret"));
+
+    assertSoftly(softly -> softly.assertThat(response.token()).isEqualTo("jwt"));
   }
 
   @Test
-  void wrongPasswordIsUnauthorized() throws Exception {
-    mvc.perform(
-            post("/auth/token")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"username\":\"alice\",\"password\":\"nope\"}"))
-        .andExpect(status().isUnauthorized());
-  }
+  void should_propagateInvalidCredentials_when_loginFails() {
+    given(loginUseCase.login("alice", "wrong")).willThrow(new InvalidCredentialsException());
 
-  @Test
-  void unknownUserIsUnauthorized() throws Exception {
-    mvc.perform(
-            post("/auth/token")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"username\":\"bob\",\"password\":\"secret\"}"))
-        .andExpect(status().isUnauthorized());
-  }
-
-  @Test
-  void secureEndpointRequiresToken() throws Exception {
-    mvc.perform(get("/api/secure/hello")).andExpect(status().isUnauthorized());
+    assertSoftly(softly ->
+        softly
+            .assertThatThrownBy(() -> controller.token(new LoginRequestDto("alice", "wrong")))
+            .isInstanceOf(InvalidCredentialsException.class));
   }
 }

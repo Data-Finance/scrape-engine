@@ -1,8 +1,9 @@
-package it.datafinance.scrape_engine.adapter.in.web;
+package it.datafinance.scrape_engine.adapter.in.web.auth;
 
-import it.datafinance.scrape_engine.adapter.in.web.security.TokenService;
+import it.datafinance.scrape_engine.adapter.in.web.auth.dto.LoginRequestDto;
+import it.datafinance.scrape_engine.adapter.in.web.auth.dto.TokenResponseDto;
+import it.datafinance.scrape_engine.adapter.in.web.security.service.TokenService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,10 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 class AuthController {
 
-  record LoginRequest(@NotBlank String username, @NotBlank String password) {}
-
-  record TokenResponse(String token) {}
-
   private final AuthenticationManager authenticationManager;
   private final TokenService tokenService;
 
@@ -32,11 +29,11 @@ class AuthController {
   }
 
   @PostMapping("/token")
-  TokenResponse token(@Valid @RequestBody LoginRequest request) {
+  TokenResponseDto token(@Valid @RequestBody LoginRequestDto request) {
     Authentication authentication =
         authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(request.username(), request.password()));
-    return new TokenResponse(tokenService.generate(authentication));
+    return new TokenResponseDto(tokenService.generate(authentication));
   }
 
   @ExceptionHandler(AuthenticationException.class)

@@ -1,15 +1,17 @@
 package it.datafinance.scrape_engine.domain.model;
 
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 
-public class UserAccount {
+/**
+ * A user that can authenticate against the engine.
+ *
+ * @param id persistence identifier, {@code null} until the account has been stored
+ */
+public record UserAccount(
+    @Nullable String id, String username, String passwordHash, Set<Role> roles) {
 
-  private final String id;
-  private final String username;
-  private final String passwordHash;
-  private final Set<Role> roles;
-
-  public UserAccount(String id, String username, String passwordHash, Set<Role> roles) {
+  public UserAccount {
     if (username == null || username.isBlank()) {
       throw new IllegalArgumentException("username must not be blank");
     }
@@ -19,25 +21,6 @@ public class UserAccount {
     if (roles == null || roles.isEmpty()) {
       throw new IllegalArgumentException("roles must not be empty");
     }
-    this.id = id;
-    this.username = username;
-    this.passwordHash = passwordHash;
-    this.roles = Set.copyOf(roles);
-  }
-
-  public String getId() {
-    return id;
-  }
-
-  public String getUsername() {
-    return username;
-  }
-
-  public String getPasswordHash() {
-    return passwordHash;
-  }
-
-  public Set<Role> getRoles() {
-    return roles;
+    roles = Set.copyOf(roles);
   }
 }

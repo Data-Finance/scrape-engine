@@ -1,4 +1,4 @@
-package it.datafinance.scrape_engine.adapter.in.web.security;
+package it.datafinance.scrape_engine.adapter.in.web.security.service;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -11,16 +11,18 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TokenService {
+class JwtTokenService implements TokenService {
 
   static final Duration TOKEN_VALIDITY = Duration.ofHours(8);
+  static final String ISSUER = "scrape-engine";
 
   private final JwtEncoder encoder;
 
-  TokenService(JwtEncoder encoder) {
+  JwtTokenService(JwtEncoder encoder) {
     this.encoder = encoder;
   }
 
+  @Override
   public String generate(Authentication authentication) {
     Instant now = Instant.now();
     String scope =
@@ -30,7 +32,7 @@ public class TokenService {
             .collect(Collectors.joining(" "));
     JwtClaimsSet claims =
         JwtClaimsSet.builder()
-            .issuer("scrape-engine")
+            .issuer(ISSUER)
             .issuedAt(now)
             .expiresAt(now.plus(TOKEN_VALIDITY))
             .subject(authentication.getName())

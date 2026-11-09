@@ -21,11 +21,11 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableConfigurationProperties(RsaKeyProperties.class)
-public class SecurityConfig {
+class SecurityConfig {
 
   private final RsaKeyProperties rsaKeys;
 
-  public SecurityConfig(RsaKeyProperties rsaKeys) {
+  SecurityConfig(RsaKeyProperties rsaKeys) {
     this.rsaKeys = rsaKeys;
   }
 

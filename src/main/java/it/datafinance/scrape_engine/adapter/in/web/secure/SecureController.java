@@ -1,4 +1,4 @@
-package it.datafinance.scrape_engine.adapter.in.web;
+package it.datafinance.scrape_engine.adapter.in.web.secure;
 
 import java.security.Principal;
 import org.springframework.web.bind.annotation.GetMapping;

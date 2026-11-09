@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import it.datafinance.scrape_engine.application.exception.InvalidCredentialsException;
-import it.datafinance.scrape_engine.application.port.in.LoginCommand;
 import it.datafinance.scrape_engine.application.port.out.PasswordVerifier;
 import it.datafinance.scrape_engine.application.port.out.TokenIssuer;
 import it.datafinance.scrape_engine.application.port.out.UserAccountRepository;
@@ -38,18 +37,18 @@ class LoginServiceTest {
 
   @Test
   void issuesTokenForValidCredentials() {
-    assertThat(service.login(new LoginCommand("alice", "secret"))).isEqualTo(TOKEN);
+    assertThat(service.login("alice", "secret")).isEqualTo(TOKEN);
   }
 
   @Test
   void rejectsWrongPassword() {
-    assertThatThrownBy(() -> service.login(new LoginCommand("alice", "wrong")))
+    assertThatThrownBy(() -> service.login("alice", "wrong"))
         .isInstanceOf(InvalidCredentialsException.class);
   }
 
   @Test
   void rejectsUnknownUserButStillVerifiesPassword() {
-    assertThatThrownBy(() -> service.login(new LoginCommand("bob", "secret")))
+    assertThatThrownBy(() -> service.login("bob", "secret"))
         .isInstanceOf(InvalidCredentialsException.class);
     assertThat(verifiedHashes).containsExactly("null");
   }

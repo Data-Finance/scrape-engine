@@ -3,7 +3,6 @@ package it.datafinance.scrape_engine.adapter.in.web.auth;
 import it.datafinance.scrape_engine.adapter.in.web.auth.dto.LoginRequestDto;
 import it.datafinance.scrape_engine.adapter.in.web.auth.dto.TokenResponseDto;
 import it.datafinance.scrape_engine.application.exception.InvalidCredentialsException;
-import it.datafinance.scrape_engine.application.port.in.LoginCommand;
 import it.datafinance.scrape_engine.application.port.in.LoginUseCase;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -26,7 +25,7 @@ class AuthController {
 
   @PostMapping("/token")
   TokenResponseDto token(@Valid @RequestBody LoginRequestDto request) {
-    var token = loginUseCase.login(new LoginCommand(request.username(), request.password()));
+    var token = loginUseCase.login(request.username(), request.password());
     return new TokenResponseDto(token.value());
   }
 

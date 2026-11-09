@@ -9,5 +9,5 @@ public interface LoginUseCase {
   /**
    * @throws InvalidCredentialsException if the user does not exist or the password is wrong
    */
-  AuthToken login(LoginCommand command);
+  AuthToken login(String username, String password);
 }

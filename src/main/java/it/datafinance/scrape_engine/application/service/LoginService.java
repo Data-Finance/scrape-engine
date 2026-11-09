@@ -2,7 +2,6 @@ package it.datafinance.scrape_engine.application.service;
 
 import it.datafinance.scrape_engine.application.ApplicationService;
 import it.datafinance.scrape_engine.application.exception.InvalidCredentialsException;
-import it.datafinance.scrape_engine.application.port.in.LoginCommand;
 import it.datafinance.scrape_engine.application.port.in.LoginUseCase;
 import it.datafinance.scrape_engine.application.port.out.PasswordVerifier;
 import it.datafinance.scrape_engine.application.port.out.TokenIssuer;
@@ -26,12 +25,11 @@ class LoginService implements LoginUseCase {
   }
 
   @Override
-  public AuthToken login(LoginCommand command) {
-    @Nullable UserAccount account = users.findByUsername(command.username()).orElse(null);
+  public AuthToken login(String username, String password) {
+    @Nullable UserAccount account = users.findByUsername(username).orElse(null);
     // Always verify, even for unknown users, so timing does not leak which usernames exist.
     boolean passwordMatches =
-        passwordVerifier.matches(
-            command.password(), account == null ? null : account.passwordHash());
+        passwordVerifier.matches(password, account == null ? null : account.passwordHash());
     if (account == null || !passwordMatches) {
       throw new InvalidCredentialsException();
     }

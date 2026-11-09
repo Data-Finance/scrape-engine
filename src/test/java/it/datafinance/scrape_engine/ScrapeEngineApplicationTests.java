@@ -1,4 +1,4 @@
-package it.datafinace.scrape_engine;
+package it.datafinance.scrape_engine;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

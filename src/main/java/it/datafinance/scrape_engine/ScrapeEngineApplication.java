@@ -1,4 +1,4 @@
-package it.datafinace.scrape_engine;
+package it.datafinance.scrape_engine;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

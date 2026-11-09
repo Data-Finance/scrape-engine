@@ -1,4 +1,4 @@
-package it.datafinace.scrape_engine;
+package it.datafinance.scrape_engine;
 
 import static com.tngtech.archunit.base.DescribedPredicate.alwaysTrue;
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAPackage;
@@ -11,7 +11,7 @@ import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
 
 @AnalyzeClasses(
-    packages = "it.datafinace.scrape_engine",
+    packages = "it.datafinance.scrape_engine",
     importOptions = ImportOption.DoNotIncludeTests.class)
 class ArchitectureTest {
 

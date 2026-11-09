@@ -12,7 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Spring Web MVC + RestClient**: REST API and outbound HTTP calls
 - **ArchUnit (junit6)**: architecture/layering rules enforced as tests
 
-Base package is `it.datafinace.scrape_engine`. Note the spelling (`datafinace`) and the underscore, which replaces the hyphen in the artifact name because hyphens aren't valid in Java package names.
+Base package is `it.datafinance.scrape_engine`. The underscore replaces the hyphen in the artifact name because hyphens aren't valid in Java package names.
 
 ## Architecture
 

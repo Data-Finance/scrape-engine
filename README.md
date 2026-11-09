@@ -56,7 +56,7 @@ Code is formatted with google-java-format through Spotless. The check runs durin
 
 ## Architecture
 
-The code follows an onion (hexagonal) architecture under `it.datafinace.scrape_engine`:
+The code follows an onion (hexagonal) architecture under `it.datafinance.scrape_engine`:
 
 | Package | Contents | Rules |
 |---|---|---|

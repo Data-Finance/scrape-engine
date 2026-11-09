@@ -1,4 +1,4 @@
-package it.datafinace.scrape_engine.domain;
+package it.datafinance.scrape_engine.domain;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

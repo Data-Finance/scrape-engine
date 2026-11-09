@@ -12,6 +12,7 @@ import com.jayway.jsonpath.JsonPath;
 import it.datafinance.scrape_engine.application.port.out.UserAccountRepository;
 import it.datafinance.scrape_engine.domain.model.Role;
 import it.datafinance.scrape_engine.domain.model.UserAccount;
+import it.datafinance.scrape_engine.support.TestRsaKeys;
 import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +24,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -30,6 +33,11 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc
 @Execution(ExecutionMode.SAME_THREAD)
 class AuthControllerIntegrationTest {
+
+  @DynamicPropertySource
+  static void rsaKeys(DynamicPropertyRegistry registry) {
+    TestRsaKeys.register(registry);
+  }
 
   @Autowired MockMvc mvc;
   @Autowired PasswordEncoder passwordEncoder;

@@ -61,10 +61,12 @@ The code follows an onion (hexagonal) architecture under `it.datafinance.scrape_
 | Package | Contents | Rules |
 |---|---|---|
 | `domain` (`domain.model`, `domain.service`) | Business model and domain logic | Plain Java: no Spring, no persistence, no adapters |
-| `application` | Use cases | Plain Java: no Spring, no persistence, no adapters |
+| `application` | Use cases | No persistence, no adapters; from Spring only `@Transactional` |
 | `adapter.in.web` | REST controllers | May depend on inner layers, not on other adapters |
 | `adapter.out.persistence` | MongoDB repositories | May depend on inner layers, not on other adapters |
 | `config` | Spring wiring | The only place where layers are connected to Spring |
+
+Transactions on MongoDB are handled by a `MongoTransactionManager` defined in `config`.
 
 Domain and application services are marked with the project's own `@DomainService` and `@ApplicationService` annotations instead of `@Service`. The configuration classes in `config` register them as Spring beans.
 
@@ -72,5 +74,5 @@ These rules are checked by `ArchitectureTest` (ArchUnit) on every build.
 
 ## Contributing
 
-- Create a `feature/<name>` branch and open a pull request to `main`.
+- Create a `feature/<name>` branch and open a pull request to `master`. GitHub Actions runs `mvn clean verify` on every pull request.
 - Commit messages use the `type(scope): description` format, e.g. `conf(pom.xml): add dependencies - jsoup`.

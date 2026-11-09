@@ -63,11 +63,13 @@ Add a user in MongoDB (`scrape-config` → `users`) with a BCrypt hash of their 
 htpasswd -bnBC 10 "" 'password' | tr -d ':\n'; echo
 ```
 
+Paste the output, including the leading `$`, as `passwordHash`:
+
 ```json
 { "username": "luca", "passwordHash": "$2y$10$...", "roles": ["USER"] }
 ```
 
-Log in to get a token (valid 8 hours), then send it with every request:
+Log in to get a token (valid 8 hours), then send it with every request. The first command returns `{"token":"..."}`; use that value as `<token>`:
 
 ```bash
 curl -X POST localhost:8080/auth/token -H 'Content-Type: application/json' \
@@ -101,5 +103,5 @@ These rules are checked by `ArchitectureTest` (ArchUnit) on every build.
 
 ## Contributing
 
-- Create a `feature/<name>` branch and open a pull request to `main`.
+- Create a `feature/<name>` branch and open a pull request to `master`.
 - Commit messages use the `type(scope): description` format, e.g. `conf(pom.xml): add dependencies - jsoup`.

@@ -21,6 +21,7 @@ Onion/hexagonal layering, enforced by `ArchitectureTest` (ArchUnit):
 - `..domain..` (`domain.model`, `domain.service`) must not depend on Spring, `jakarta.persistence` or adapters. It is plain Java.
 - `..application..` has the same restrictions, except that it may use `org.springframework.transaction.annotation` (`@Transactional`, `Propagation`, `Isolation`). The `MongoTransactionManager` bean in `config` backs `@Transactional`.
 - `..adapter.in.web..`, `..adapter.out.persistence..`: adapters, which may depend on the inner layers but not on each other.
+- Ports live in `application.port.in` (use cases, implemented by `application.service`) and `application.port.out` (driven ports, implemented by `adapter.out.*`). Inbound adapters may only call `port.in`. No adapter may reference `application.service` directly. `ArchitectureTest` enforces both rules.
 - `..config..` is the only place where the layers are wired into Spring. It is excluded from the onion layer checks.
 
 Because domain and application can't use Spring stereotypes such as `@Service` or `@Component`, they use the project's own marker annotations, `@DomainService` (`domain`) and `@ApplicationService` (`application`). `DomainServiceConfig` and `ApplicationServiceConfig` in `config` turn annotated classes into beans with `@ComponentScan` include filters. When you add a domain or application service, annotate it with one of these markers rather than a Spring stereotype.

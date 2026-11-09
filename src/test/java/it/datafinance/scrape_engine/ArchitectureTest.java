@@ -39,6 +39,28 @@ class ArchitectureTest {
                   .and(not(resideInAPackage("org.springframework.transaction.annotation.."))))
           .allowEmptyShould(true);
 
+  // Driving (inbound) adapters must go through use cases, never straight to driven ports
+  @ArchTest
+  static final ArchRule inboundAdaptersDoNotUseOutboundPorts =
+      noClasses()
+          .that()
+          .resideInAPackage("..adapter.in..")
+          .should()
+          .dependOnClassesThat()
+          .resideInAPackage("..application.port.out..")
+          .allowEmptyShould(true);
+
+  // Adapters talk to the application only through ports, not to service implementations
+  @ArchTest
+  static final ArchRule adaptersDoNotUseApplicationServices =
+      noClasses()
+          .that()
+          .resideInAPackage("..adapter..")
+          .should()
+          .dependOnClassesThat()
+          .resideInAPackage("..application.service..")
+          .allowEmptyShould(true);
+
   @ArchTest
   static final ArchRule layers =
       onionArchitecture()
@@ -47,6 +69,7 @@ class ArchitectureTest {
           .applicationServices("..application..")
           .adapter("web", "..adapter.in.web..")
           .adapter("persistence", "..adapter.out.persistence..")
+          .adapter("security", "..adapter.out.security..")
           .ignoreDependency(resideInAPackage("..config.."), alwaysTrue())
           .withOptionalLayers(true);
 }

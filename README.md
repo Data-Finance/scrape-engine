@@ -57,6 +57,26 @@ Run a single test class or method:
 
 The `@SpringBootTest` tests need `.env` and `certs/`.
 
+### Users
+
+Add a user in MongoDB (`scrape-config` → `users`) with a BCrypt hash of their password:
+
+```bash
+htpasswd -bnBC 10 "" 'password' | tr -d ':\n'; echo
+```
+
+```json
+{ "username": "luca", "passwordHash": "$2y$10$...", "roles": ["USER"] }
+```
+
+Log in to get a token (valid 8 hours), then send it with every request:
+
+```bash
+curl -X POST localhost:8080/auth/token -H 'Content-Type: application/json' \
+  -d '{"username":"luca","password":"password"}'
+curl localhost:8080/api/secure/hello -H "Authorization: Bearer <token>"
+```
+
 ### Code formatting
 
 Code is formatted with google-java-format through Spotless. The check runs during compilation, so unformatted code fails the build. Format before building:

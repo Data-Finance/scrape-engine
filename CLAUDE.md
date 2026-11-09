@@ -18,11 +18,12 @@ Base package is `it.datafinance.scrape_engine`. The underscore replaces the hyph
 
 Onion/hexagonal layering, enforced by `ArchitectureTest` (ArchUnit):
 
-- `..domain..` (`domain.model`, `domain.service`) and `..application..` must not depend on Spring, `jakarta.persistence` or adapters. They are plain Java.
+- `..domain..` (`domain.model`, `domain.service`) must not depend on Spring, `jakarta.persistence` or adapters. It is plain Java.
+- `..application..` has the same restrictions, except that it may use `org.springframework.transaction.annotation` (`@Transactional`, `Propagation`, `Isolation`). The `MongoTransactionManager` bean in `config` backs `@Transactional`.
 - `..adapter.in.web..`, `..adapter.out.persistence..`: adapters, which may depend on the inner layers but not on each other.
 - `..config..` is the only place where the layers are wired into Spring. It is excluded from the onion layer checks.
 
-Because domain and application can't use `@Service`/`@Component`, they use the project's own marker annotations, `@DomainService` (`domain`) and `@ApplicationService` (`application`). `DomainServiceConfig` and `ApplicationServiceConfig` in `config` turn annotated classes into beans with `@ComponentScan` include filters. When you add a domain or application service, annotate it with one of these markers rather than a Spring stereotype.
+Because domain and application can't use Spring stereotypes such as `@Service` or `@Component`, they use the project's own marker annotations, `@DomainService` (`domain`) and `@ApplicationService` (`application`). `DomainServiceConfig` and `ApplicationServiceConfig` in `config` turn annotated classes into beans with `@ComponentScan` include filters. When you add a domain or application service, annotate it with one of these markers rather than a Spring stereotype.
 
 Layers are optional and the rules allow empty packages, so the test passes before the packages exist. When you add a new adapter (e.g. batch or scraper), register it in `ArchitectureTest`.
 
@@ -50,5 +51,6 @@ Formatting is enforced by Spotless with google-java-format (2-space indent). `sp
 
 ## Git conventions
 
-- Work on `feature/<name>` branches and merge into `main` via PR.
+- Work on `feature/<name>` branches and merge into `master` via PR. The git remote is named `scrape-engine`, not `origin`.
+- CI (`.github/workflows/maven.yml`) runs `mvn clean verify` with Java 27 on pushes and PRs to `master`.
 - Commit messages follow a `type(scope): description` style, e.g. `conf(pom.xml): add dependencies - jsoup`.

@@ -11,5 +11,5 @@ public interface ScrapingStatusRepository
 
   List<ScrapingStatusCollection> findByEndedAt(Instant endedAt);
 
-  // List<ScrapingStatusCollection> findByStartedAtBetween(Instant startedAt, Instant endedAt);
+  List<ScrapingStatusCollection> findByStartedAtBetween(Instant startedAt, Instant endedAt);
 }

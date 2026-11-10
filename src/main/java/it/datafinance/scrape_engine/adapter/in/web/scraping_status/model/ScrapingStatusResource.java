@@ -1,4 +1,4 @@
-package it.datafinance.scrape_engine.adapter.in.scraping_status;
+package it.datafinance.scrape_engine.adapter.in.web.scraping_status.model;
 
 import java.time.ZonedDateTime;
 import org.jspecify.annotations.NullMarked;

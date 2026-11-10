@@ -3,8 +3,8 @@ name: Java CI with Maven
 on:
   push:
     branches: [ "master" ]
+  # Every PR, whatever its target branch (e.g. stacked PRs onto feature branches)
   pull_request:
-    branches: [ "master" ]
 
 jobs:
   build:
@@ -22,5 +22,19 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
+      # certs/ is git-ignored, so CI creates a throwaway key pair just for the build.
+      - name: Generate JWT keys
+        run: |
+          mkdir certs
+          openssl genrsa -out certs/keypair.pem 2048
+          openssl rsa -in certs/keypair.pem -pubout -out certs/public.pem
+          openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in certs/keypair.pem -out certs/private.pem
+          rm certs/keypair.pem
+
+      # No .env in CI: point MongoDB at a dummy address and skip index creation,
+      # so the context test starts the app without connecting to Atlas.
       - name: Build and Test with Maven
         run: mvn clean verify --file pom.xml
+        env:
+          SPRING_MONGODB_URI: mongodb://localhost:27017/ci
+          SPRING_DATA_MONGODB_AUTOINDEXCREATION: "false"

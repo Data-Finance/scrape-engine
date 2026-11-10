@@ -9,6 +9,7 @@ Scraping service of the Data-Finance project. It fetches and parses web pages wi
 - Java 27, Spring Boot 4.1, Maven (wrapper included)
 - Spring Batch, Spring Web MVC, RestClient
 - Spring Data MongoDB (MongoDB Atlas)
+- Spring Security with JWT (OAuth2 resource server)
 - jsoup
 - ArchUnit, Spotless (google-java-format)
 
@@ -30,6 +31,16 @@ DB_MONGO_PASS=<password>
 
 Spring Boot loads it automatically. The connection string itself is in `src/main/resources/application.properties`.
 
+Generate the JWT signing keys in `certs/` (it is git-ignored):
+
+```bash
+mkdir certs && cd certs
+openssl genrsa -out keypair.pem 2048
+openssl rsa -in keypair.pem -pubout -out public.pem
+openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in keypair.pem -out private.pem
+rm keypair.pem && cd ..
+```
+
 ### Build and run
 
 ```bash
@@ -44,7 +55,27 @@ Run a single test class or method:
 ./mvnw test -Dtest=ScrapeEngineApplicationTests#contextLoads
 ```
 
-The `@SpringBootTest` tests need a valid `.env` to connect to MongoDB.
+### Users
+
+Add a user in MongoDB (`scrape-config` → `users`) with a BCrypt hash of their password:
+
+```bash
+htpasswd -bnBC 10 "" 'password' | tr -d ':\n'; echo
+```
+
+Paste the output, including the leading `$`, as `passwordHash`:
+
+```json
+{ "username": "luca", "passwordHash": "$2y$10$...", "roles": ["USER"] }
+```
+
+Log in to get a token (valid 8 hours), then send it with every request. The first command returns `{"token":"..."}`; use that value as `<token>`:
+
+```bash
+curl -X POST localhost:8080/auth/token -H 'Content-Type: application/json' \
+  -d '{"username":"luca","password":"password"}'
+curl localhost:8080/api/secure/hello -H "Authorization: Bearer <token>"
+```
 
 ### Code formatting
 

@@ -52,6 +52,6 @@ Formatting is enforced by Spotless with google-java-format (2-space indent). `sp
 
 ## Git conventions
 
-- Work on `feature/<name>` branches and merge into `master` via PR. The git remote is named `scrape-engine`, not `origin`.
+- Work on `feature/<name>` branches and merge into `master` via PR. The git remote is named `origin`.
 - CI (`.github/workflows/maven.yml`) runs `mvn clean verify` with Java 27 on pushes to `master` and on every pull request, whatever its target branch.
 - Commit messages follow a `type(scope): description` style, e.g. `conf(pom.xml): add dependencies - jsoup`.

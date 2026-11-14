@@ -69,6 +69,12 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.instancio</groupId>
+			<artifactId>instancio-junit</artifactId>
+			<version>6.2.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>com.tngtech.archunit</groupId>
 			<artifactId>archunit-junit6</artifactId>
 			<version>1.5.1</version>

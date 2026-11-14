@@ -6,6 +6,9 @@ on:
   # Every PR, whatever its target branch (e.g. stacked PRs onto feature branches)
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Build and test

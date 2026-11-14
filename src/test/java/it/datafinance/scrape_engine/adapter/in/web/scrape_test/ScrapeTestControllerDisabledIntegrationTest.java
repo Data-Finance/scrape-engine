@@ -14,7 +14,7 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
-@SpringBootTest
+@SpringBootTest(properties = "scraper.test-api.enabled=false")
 @AutoConfigureMockMvc
 @Execution(ExecutionMode.SAME_THREAD)
 class ScrapeTestControllerDisabledIntegrationTest {
@@ -27,7 +27,7 @@ class ScrapeTestControllerDisabledIntegrationTest {
   @Autowired MockMvc mvc;
 
   @Test
-  void should_notExposeEndpoint_when_testApiIsNotEnabled() throws Exception {
+  void should_notExposeEndpoint_when_testApiIsDisabled() throws Exception {
     mvc.perform(get("/scrape-test/eurizon").param("url", "https://example.com/documents"))
         .andExpect(status().isNotFound());
   }

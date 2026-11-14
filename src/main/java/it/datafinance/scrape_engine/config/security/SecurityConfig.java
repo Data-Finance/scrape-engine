@@ -33,7 +33,13 @@ class SecurityConfig {
     // quindi niente rischio CSRF)
     return http.csrf(csrf -> csrf.ignoringRequestMatchers("/auth/token"))
         .authorizeHttpRequests(auth ->
-            auth.requestMatchers("/auth/token", "/error").permitAll().anyRequest().authenticated())
+            auth.requestMatchers("/auth/token", "/error")
+                .permitAll()
+                // Endpoint di prova, registrato solo con scraper.test-api.enabled=true
+                .requestMatchers("/scrape-test/**")
+                .permitAll()
+                .anyRequest()
+                .authenticated())
         .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
         .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .build();

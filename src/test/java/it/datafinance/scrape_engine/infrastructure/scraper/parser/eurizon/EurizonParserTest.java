@@ -29,9 +29,7 @@ class EurizonParserTest {
   private final URL luxembourgKidUrl = downloadUrl("HHGGEB");
 
   private final EurizonClient client = mock(EurizonClient.class);
-  private final EurizonParser parser =
-      new EurizonParser(
-          client, new EurizonPageExtractor(JsonMapper.builder().build()), Duration.ZERO);
+  private final EurizonParser parser = parserLimitedTo(0);
 
   @Test
   void should_returnKidsWithIsinFromFileName_when_pageListsKids() throws IOException {
@@ -57,6 +55,27 @@ class EurizonParserTest {
       // The prospectus listed in the page is not a KID and must not be downloaded
       softly
           .assertThatCode(() -> verify(client, times(2)).download(any()))
+          .doesNotThrowAnyException();
+    });
+  }
+
+  @Test
+  void should_downloadOnlyTheFirstKids_when_limitIsSet() throws IOException {
+    ScrapedFile italianKid = new ScrapedFile("55_11788-1_IT0005506610.pdf", PDF);
+    when(client.fetchPage(siteUrl)).thenReturn(EurizonFixtures.PAGE);
+    when(client.download(italianKidUrl)).thenReturn(italianKid);
+
+    ScrapeResult result = parserLimitedTo(1).execute(siteUrl);
+
+    assertSoftly(softly -> {
+      softly
+          .assertThat(result)
+          .isEqualTo(
+              new ScrapeResult.Success(
+                  List.of(
+                      new ScrapedProduct("Eurizon Investo Smart 10", "IT0005506610", italianKid))));
+      softly
+          .assertThatCode(() -> verify(client, never()).download(luxembourgKidUrl))
           .doesNotThrowAnyException();
     });
   }
@@ -154,6 +173,11 @@ class EurizonParserTest {
 
     assertSoftly(
         softly -> assertFailedWith(softly, parser.execute(siteUrl), "EURIZON.DOWNLOAD_FAILED"));
+  }
+
+  private EurizonParser parserLimitedTo(int maxKids) {
+    return new EurizonParser(
+        client, new EurizonPageExtractor(JsonMapper.builder().build()), Duration.ZERO, maxKids);
   }
 
   private static void assertFailedWith(SoftAssertions softly, ScrapeResult result, String code) {

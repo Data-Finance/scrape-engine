@@ -45,14 +45,17 @@ class EurizonParser implements BaseParser {
   private final EurizonClient client;
   private final EurizonPageExtractor extractor;
   private final Duration downloadDelay;
+  private final int maxKids;
 
   EurizonParser(
       EurizonClient client,
       EurizonPageExtractor extractor,
-      @Value("${scraper.eurizon.download-delay}") Duration downloadDelay) {
+      @Value("${scraper.eurizon.download-delay}") Duration downloadDelay,
+      @Value("${scraper.eurizon.max-kids}") int maxKids) {
     this.client = client;
     this.extractor = extractor;
     this.downloadDelay = downloadDelay;
+    this.maxKids = maxKids;
   }
 
   @Override
@@ -72,6 +75,10 @@ class EurizonParser implements BaseParser {
       log.warn("Eurizon page {} could not be fetched", siteUrl, e);
       return new ScrapeResult.Failed(
           "Impossible to fetch the Eurizon documentation page", "EURIZON.PAGE_UNREACHABLE");
+    }
+    if (maxKids > 0 && kids.size() > maxKids) {
+      log.info("Eurizon scrape limited to the first {} of {} KIDs", maxKids, kids.size());
+      kids = kids.subList(0, maxKids);
     }
     if (kids.isEmpty()) {
       log.warn("Eurizon scrape failed: no KID document found in {}", siteUrl);

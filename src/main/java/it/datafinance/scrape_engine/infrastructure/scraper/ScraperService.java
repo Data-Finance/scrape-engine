@@ -24,11 +24,12 @@ class ScraperService implements BaseScraperService {
   @Override
   public ScrapeResult execute(ScrapeRequest request) {
     log.info("Scrape requested for {} on {}", request.corporation(), request.siteUrl());
-    var parser = factory.getBean(request.corporation());
-    if (parser instanceof BaseParser) {
+    // getBean throws for an unknown name, so the name is checked first
+    if (factory.containsBean(request.corporation())
+        && factory.getBean(request.corporation()) instanceof BaseParser parser) {
       log.debug("Scrape for {} handled by {}", request.corporation(), parser.getClass().getName());
       long startedAt = System.nanoTime();
-      ScrapeResult result = ((BaseParser) parser).execute(request.siteUrl());
+      ScrapeResult result = parser.execute(request.siteUrl());
       logOutcome(request, result, Duration.ofNanos(System.nanoTime() - startedAt));
       return result;
     }
